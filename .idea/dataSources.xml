@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" hash="663560916">
+    <data-source source="LOCAL" name="Derby - MojaDB@localhost" uuid="e0202f5f-2ac4-4c9d-8529-e63c4cb64340">
+      <driver-ref>derby.remote</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.apache.derby.jdbc.ClientDriver</jdbc-driver>
+      <jdbc-url>jdbc:derby://localhost:1527/MojaDB</jdbc-url>
+      <user-name>wexik</user-name>
+      <user-password>dfc2dfcfdfd9dfc6dfc5</user-password>
+      <libraries />
+    </data-source>
+  </component>
+</project>
+
