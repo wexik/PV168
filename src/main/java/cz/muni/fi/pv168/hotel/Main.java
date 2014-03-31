@@ -33,10 +33,10 @@ public class Main {
 
         RentManager rentManager = new RentManagerImpl(getDateSource());
 
-        //roomManager.findAllRooms().forEach(System.out::println);
-        //System.out.println(roomManager.findRoomById(1500));
-        //Room room = new Room(300, 4, new BigDecimal("25.53"));
-        //roomManager.createRoom(room);
+        roomManager.findAllRooms().forEach(System.out::println);
+        System.out.println(roomManager.findRoomById(1500));
+        Room room = new Room(300, 4, new BigDecimal("25.53"));
+        roomManager.createRoom(room);
     }
 
     /*@Configuration
