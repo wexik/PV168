@@ -30,14 +30,13 @@ public class RentManagerImpl implements RentManager {
     private RowMapper<Rent> rentRowMapper = (rs, rowNum) -> {
         try {
             return new Rent(rs.getLong("id"), rs.getBigDecimal("price"), roomManager.findRoomById(rs.getInt("roomId")),
-                    personManager.findPersonById(rs.getInt("personId")),
+                    personManager.findPersonById(rs.getLong("personId")),
                         rs.getDate("startDay").toLocalDate(), rs.getDate("expectedEndDay").toLocalDate(),
                             rs.getTimestamp("realEndDay").toLocalDateTime(), rs.getInt("countOGuestInRoom"));
         } catch (RoomException e) {
             log.error("cannot find room", e);
-        } catch (PersonException e) {
-            log.error("cannot find person", e);
-        } return null;
+        }
+        return null;
     };
 
     public RentManagerImpl(DataSource dataSource) {
@@ -85,7 +84,7 @@ public class RentManagerImpl implements RentManager {
                                 .addValue("expectedendday", toSQLDate(rent.getExpectedEndDay()))
                                     .addValue("realendday", toSQLTimestamp(rent.getRealEndDay()))
                                         .addValue("price", rent.getPrice())
-                                            .addValue("countoguestsinroom", rent.getCountOfGuestsInRoom());
+                                            .addValue("countofguestsinroom", rent.getCountOfGuestsInRoom());
             Number id = insertRent.executeAndReturnKey(parameters);
             rent.setId(id.longValue());
         }

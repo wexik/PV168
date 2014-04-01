@@ -7,14 +7,14 @@ import java.util.List;
  */
 public interface PersonManager {
 
-    void createPerson(Person person) throws PersonException;
+    void createPerson(Person person);
 
-    void deletePerson(Person person) throws PersonException;
+    void deletePerson(Person person);
 
-    List<Person> findAllPersons() throws PersonException;
+    List<Person> findAllPeople();
 
-    Person findPersonById(int id) throws PersonException;
+    Person findPersonById(Long id);
 
-    void updatePerson(Person person) throws PersonException;
+    void updatePerson(Person person);
 
 }

@@ -5,7 +5,7 @@ package cz.muni.fi.pv168.hotel;
  */
 public class Person {
 
-    private int id;
+    private Long id;
     private String name;
     private String phoneNumber;
     private String address;
@@ -13,7 +13,7 @@ public class Person {
     public Person() {
     }
 
-    public Person(int id, String name, String phoneNumber, String address) {
+    public Person(Long id, String name, String phoneNumber, String address) {
 
         this.id = id;
         this.name = name;
@@ -21,11 +21,11 @@ public class Person {
         this.address = address;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -70,7 +70,7 @@ public class Person {
 
     @Override
     public int hashCode() {
-        int result = id;
+        int result = id.intValue();
         result = 31 * result + name.hashCode();
         result = 31 * result + phoneNumber.hashCode();
         result = 31 * result + address.hashCode();

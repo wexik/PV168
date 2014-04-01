@@ -1,23 +1,9 @@
 package cz.muni.fi.pv168.hotel;
 
 import org.apache.derby.jdbc.ClientDataSource;
-import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.sql.DataSource;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Properties;
 
 /**
@@ -80,9 +66,14 @@ public class Main {
         }
     }*/
 
-    public static ClientDataSource getDateSource() throws IOException {
+    public static ClientDataSource getDateSource(){
         Properties myConf = new Properties();
-        myConf.load(Main.class.getResourceAsStream("/jdbc.properties"));
+
+        try {
+            myConf.load(Main.class.getResourceAsStream("/jdbc.properties"));
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load resources");
+        }
 
         ClientDataSource ds = new ClientDataSource();
         ds.setDatabaseName(myConf.getProperty("jdbc.dbname"));
