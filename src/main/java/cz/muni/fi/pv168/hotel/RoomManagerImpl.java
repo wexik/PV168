@@ -1,7 +1,5 @@
 package cz.muni.fi.pv168.hotel;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -9,8 +7,6 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
 import javax.sql.DataSource;
-import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,7 +18,7 @@ public class RoomManagerImpl implements RoomManager {
 
     private final JdbcTemplate jdbc;
     private RowMapper<Room> roomMapper = (rs, rowNum) ->
-            new Room(rs.getInt("id"), rs.getInt("capacity"), rs.getBigDecimal("pricePerDay"));
+            new Room(rs.getLong("id"), rs.getInt("capacity"), rs.getBigDecimal("pricePerDay"));
 
     public RoomManagerImpl(DataSource dataSource) {
         this.jdbc = new JdbcTemplate(dataSource);
@@ -74,7 +70,7 @@ public class RoomManagerImpl implements RoomManager {
     }
 
     @Override
-    public Room findRoomById(int id) throws RoomException {
+    public Room findRoomById(Long id) throws RoomException {
         //log.debug("getRoomByID({})", i);
         try {
             return jdbc.queryForObject("SELECT * FROM rooms WHERE id=?", roomMapper, id);
@@ -92,7 +88,7 @@ public class RoomManagerImpl implements RoomManager {
             throw new IllegalArgumentException("Object room is null");
         }
 
-        if (room.getId() <= 0) {
+        if (room.getId() != null) {
             //log.error("bad id");
             throw new IllegalArgumentException("bad argument id");
         }
@@ -116,6 +112,6 @@ public class RoomManagerImpl implements RoomManager {
                 .addValue("pricePerDay", room.getPricePerDay());
 
         Number id = insertRoom.executeAndReturnKey(parameters);
-        room.setId(id.intValue());
+        room.setId(id.longValue());
     }
 }

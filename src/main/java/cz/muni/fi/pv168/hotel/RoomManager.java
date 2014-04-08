@@ -1,8 +1,5 @@
 package cz.muni.fi.pv168.hotel;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.List;
 
 /**
@@ -16,7 +13,7 @@ public interface RoomManager {
 
     List<Room> findAllRooms() throws RoomException;
 
-    Room findRoomById(int i) throws RoomException;
+    Room findRoomById(Long i) throws RoomException;
 
     void updateRoom(Room room) throws RoomException;
 

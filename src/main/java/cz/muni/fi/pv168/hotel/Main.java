@@ -1,28 +1,45 @@
 package cz.muni.fi.pv168.hotel;
 
-import org.apache.derby.jdbc.ClientDataSource;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
+import javax.sql.DataSource;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.Properties;
+import java.sql.SQLException;
 
 /**
  * Created by wexik on 21.3.2014.
  */
 public class Main {
 
-    public static void main(String[] args) throws RoomException, IOException {
+    public static void main(String[] args) throws RoomException, IOException, SQLException {
+
+        EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
+        EmbeddedDatabase db = builder.setType(EmbeddedDatabaseType.HSQL).addScript("init.sql").build();
+
+        PersonManager personManager = new PersonManagerImpl(db);
+
         /*ApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfig.class);
         RoomManager roomManager = ctx.getBean(RoomManager.class);*/
 
-        RoomManager roomManager = new RoomManagerImpl(getDateSource());
+//        RoomManager roomManager = new RoomManagerImpl(getDateSource());
 
-        RentManager rentManager = new RentManagerImpl(getDateSource());
+//        RentManager rentManager = new RentManagerImpl(getDateSource());
 
-        roomManager.findAllRooms().forEach(System.out::println);
-        System.out.println(roomManager.findRoomById(1500));
-        Room room = new Room(300, 4, new BigDecimal("25.53"));
-        roomManager.createRoom(room);
+//        roomManager.findAllRooms().forEach(System.out::println);
+//        System.out.println(roomManager.findRoomById(1500));
+//        Room room = new Room(300, 4, new BigDecimal("25.53"));
+//        roomManager.createRoom(room);
+    }
+
+    static String readFile(String path) {
+        return convertStreamToString(Main.class.getClassLoader().getResourceAsStream(path));
+    }
+
+    static String convertStreamToString(java.io.InputStream is) {
+        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
     }
 
     /*@Configuration
@@ -66,21 +83,26 @@ public class Main {
         }
     }*/
 
-    public static ClientDataSource getDateSource(){
-        Properties myConf = new Properties();
+    public static DataSource getDateSource(){
+//        Properties myConf = new Properties();
+//
+//        try {
+//            myConf.load(Main.class.getResourceAsStream("/jdbc.properties"));
+//        } catch (IOException e) {
+//            throw new RuntimeException("Failed to load resources");
+//        }
+//
+//        ClientDataSource ds = new ClientDataSource();
+//        ds.setDatabaseName(myConf.getProperty("jdbc.dbname"));
+//        ds.setUser(myConf.getProperty("jdbc.user"));
+//        ds.setPassword(myConf.getProperty("jdbc.password"));
+//
+//        return ds;
 
-        try {
-            myConf.load(Main.class.getResourceAsStream("/jdbc.properties"));
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to load resources");
-        }
+        EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
+        EmbeddedDatabase build = builder.setType(EmbeddedDatabaseType.HSQL).addScript("init.sql").build();
 
-        ClientDataSource ds = new ClientDataSource();
-        ds.setDatabaseName(myConf.getProperty("jdbc.dbname"));
-        ds.setUser(myConf.getProperty("jdbc.user"));
-        ds.setPassword(myConf.getProperty("jdbc.password"));
-
-        return ds;
+        return build;
     }
 
     //ahoj

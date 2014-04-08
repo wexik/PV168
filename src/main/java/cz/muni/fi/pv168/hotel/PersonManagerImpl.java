@@ -1,5 +1,6 @@
 package cz.muni.fi.pv168.hotel;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -95,7 +96,13 @@ public class PersonManagerImpl extends NamedParameterJdbcTemplate implements Per
             throw new IllegalArgumentException("ID is null");
         }
 
-        return getJdbcOperations().queryForObject("SELECT id, person_name, phone_number, address FROM person WHERE id=?", new PersonMapper(), id);
+        Person person = null;
+        try {
+            person = getJdbcOperations().queryForObject("SELECT id, person_name, phone_number, address FROM person WHERE id=?", new PersonMapper(), id);
+        } catch (EmptyResultDataAccessException e) {
+            // LOG exception and do nothing, null will be returned
+        }
+        return person;
     }
 
     @Override
@@ -113,7 +120,8 @@ public class PersonManagerImpl extends NamedParameterJdbcTemplate implements Per
         params.put(ATTR_PHONE_NUMBER, person.getPhoneNumber());
         params.put(ATTR_ADDRESS, person.getAddress());
 
-        int affectedRows = getJdbcOperations().update("UPDATE person SET person_name=:person_name, phone_number=:phone_number, address=:address WHERE id=:id", params);
+        int affectedRows = getJdbcOperations().update("UPDATE person SET person_name=?, phone_number=?, address=? WHERE id=?",
+                person.getName(), person.getPhoneNumber(), person.getAddress(), person.getId());
         if (affectedRows != 1) {
             throw new PersistenceException("Update rows " + affectedRows);
         }

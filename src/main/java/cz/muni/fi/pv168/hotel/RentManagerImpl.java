@@ -2,6 +2,7 @@ package cz.muni.fi.pv168.hotel;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -10,12 +11,12 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,10 +30,10 @@ public class RentManagerImpl implements RentManager {
     private PersonManager personManager;
     private RowMapper<Rent> rentRowMapper = (rs, rowNum) -> {
         try {
-            return new Rent(rs.getLong("id"), rs.getBigDecimal("price"), roomManager.findRoomById(rs.getInt("roomId")),
+            return new Rent(rs.getLong("id"), rs.getBigDecimal("price"), roomManager.findRoomById(rs.getLong("roomId")),
                     personManager.findPersonById(rs.getLong("personId")),
                         rs.getDate("startDay").toLocalDate(), rs.getDate("expectedEndDay").toLocalDate(),
-                            rs.getTimestamp("realEndDay").toLocalDateTime(), rs.getInt("countOGuestInRoom"));
+                            rs.getTimestamp("realEndDay").toLocalDateTime(), rs.getInt("countOGuestsInRoom"));
         } catch (RoomException e) {
             log.error("cannot find room", e);
         }
@@ -55,7 +56,7 @@ public class RentManagerImpl implements RentManager {
     public List<Rent> findRentsForPerson(Person person) {
         return jdbc.query("SELECT * FROM rents WHERE personId=?",
                 (rs, rowNum) -> {
-                    int roomId = rs.getInt("roomId");
+                    Long roomId = rs.getLong("roomId");
                     Room room = null;
                     try {
                         room = roomManager.findRoomById(roomId);
@@ -84,7 +85,7 @@ public class RentManagerImpl implements RentManager {
                                 .addValue("expectedendday", toSQLDate(rent.getExpectedEndDay()))
                                     .addValue("realendday", toSQLTimestamp(rent.getRealEndDay()))
                                         .addValue("price", rent.getPrice())
-                                            .addValue("countofguestsinroom", rent.getCountOfGuestsInRoom());
+                                            .addValue("countOGuestsInRoom", rent.getCountOfGuestsInRoom());
             Number id = insertRent.executeAndReturnKey(parameters);
             rent.setId(id.longValue());
         }
@@ -107,7 +108,13 @@ public class RentManagerImpl implements RentManager {
 
     @Override
     public Rent findRentById(Long id) {
-        return jdbc.queryForObject("SELECT * FROM rents WHERE id=?", rentRowMapper, id);
+        Rent rent = null;
+        try {
+            rent = jdbc.queryForObject("SELECT * FROM rents WHERE id=?", rentRowMapper, id);
+        } catch (EmptyResultDataAccessException e) {
+            // LOG exception, do nothing to return null
+        }
+        return rent;
     }
 
     @Override
@@ -116,7 +123,7 @@ public class RentManagerImpl implements RentManager {
                         "price=?, countOGuestsInRoom=? WHERE id=?",
                             rent.getRoom().getId(), rent.getPerson().getId(), toSQLDate(rent.getStartDay()),
                                 toSQLDate(rent.getExpectedEndDay()), toSQLTimestamp(rent.getRealEndDay()),
-                                    rent.getPrice(), rent.getCountOfGuestsInRoom());
+                                    rent.getPrice(), rent.getCountOfGuestsInRoom(), rent.getId());
     }
 
     private Date toSQLDate(LocalDate localDate) {

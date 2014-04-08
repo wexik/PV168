@@ -1,7 +1,11 @@
 package cz.muni.fi.pv168.hotel;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 import static org.junit.Assert.*;
 
@@ -13,9 +17,18 @@ public class PersonManagerImplTest {
 
     private PersonManager personManager;
 
+    private EmbeddedDatabase dataSource;
+
     @Before
     public void setUp() {
-        personManager = new PersonManagerImpl(Main.getDateSource());
+        EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
+        dataSource = builder.setType(EmbeddedDatabaseType.HSQL).addScript("init.sql").build();
+        personManager = new PersonManagerImpl(dataSource);
+    }
+
+    @After
+    public void tearDown() {
+        dataSource.shutdown();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -105,7 +118,7 @@ public class PersonManagerImplTest {
         personManager.createPerson(person);
 
         Person foundPerson = personManager.findPersonById(person.getId());
-        assertEquals("Ja", foundPerson.getName());
+        assertEquals("ja", foundPerson.getName());
         assertEquals("666", foundPerson.getPhoneNumber());
         assertEquals("Praha", foundPerson.getAddress());
     }

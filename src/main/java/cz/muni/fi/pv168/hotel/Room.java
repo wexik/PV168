@@ -1,8 +1,5 @@
 package cz.muni.fi.pv168.hotel;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.math.BigDecimal;
 
 /**
@@ -10,24 +7,24 @@ import java.math.BigDecimal;
  */
 public class Room {
 
-    private int id;
+    private Long id;
     private int capacity;
     private BigDecimal pricePerDay;
 
     public Room() {
     }
 
-    public Room(int id, int capacity, BigDecimal pricePerDay) {
+    public Room(Long id, int capacity, BigDecimal pricePerDay) {
         this.id = id;
         this.capacity = capacity;
         this.pricePerDay = pricePerDay;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -63,7 +60,7 @@ public class Room {
 
     @Override
     public int hashCode() {
-        int result = id;
+        int result = id.intValue();
         result = 31 * result + capacity;
         result = 31 * result + pricePerDay.hashCode();
         return result;
