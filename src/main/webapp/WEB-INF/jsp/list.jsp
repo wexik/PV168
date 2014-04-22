@@ -6,12 +6,15 @@
 </head>
 <body>
     <h1>Create person</h1>
+    <c:if test="${not empty error}">
+        <span style="color: red;">${error}</span>
+    </c:if>
     <c:choose>
         <c:when test="${editPerson == null}">
             <form method="POST" action="${pageContext.request.contextPath}/add">
                 Name: <input type="text" name="name" /><br />
                 Address: <input type="text" name="address" /><br />
-                Phone: <input type="text" name="phone" /><br />
+                Phone: <input type="text" name="phoneNumber" /><br />
                 <input type="submit" value="Add">
             </form>
         </c:when>
@@ -20,7 +23,7 @@
                 <input type="hidden" name="id" value="${editPerson.id}" /><br />
                 Name: <input type="text" name="name" value="${editPerson.name}" /><br />
                 Address: <input type="text" name="address" value="${editPerson.address}"  /><br />
-                Phone: <input type="text" name="phone" value="${editPerson.phoneNumber}" /><br />
+                Phone: <input type="text" name="phoneNumber" value="${editPerson.phoneNumber}" /><br />
                 <input type="submit" value="Edit">
             </form>
         </c:otherwise>
@@ -30,12 +33,12 @@
     <ul>
         <c:forEach items="${people}" var="person">
             <li>
-                ${person.name} | ${person.address} | ${person.phoneNumber}
                 <form method="POST" action="${pageContext.request.contextPath}/delete">
-                    <input type="hidden" value="${person.id}" name="personId" />
-                    <input type="submit" value="Delete">
+                    <input type="hidden" value="${person.id}" name="id" />
+                    ${person.name} | ${person.address} | ${person.phoneNumber}
+                    | <input type="submit" value="Delete">
+                    | <a href="${pageContext.request.contextPath}/edit?id=${person.id}">Edit</a>
                 </form>
-                <a href="${pageContext.request.contextPath}/edit?id=${person.id}">Edit</a>
             </li>
         </c:forEach>
     </ul>
