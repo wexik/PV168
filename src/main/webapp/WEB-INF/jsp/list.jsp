@@ -36,8 +36,8 @@
                 <form method="POST" action="${pageContext.request.contextPath}/delete">
                     <input type="hidden" value="${person.id}" name="id" />
                     ${person.name} | ${person.address} | ${person.phoneNumber}
-                    | <input type="submit" value="Delete">
-                    | <a href="${pageContext.request.contextPath}/edit?id=${person.id}">Edit</a>
+                    | <input type="submit" value="Delete"><%--POST--%>
+                    | <a href="${pageContext.request.contextPath}/edit?id=${person.id}">Edit</a><%--GET--%>
                 </form>
             </li>
         </c:forEach>

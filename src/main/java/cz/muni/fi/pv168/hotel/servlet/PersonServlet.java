@@ -65,13 +65,13 @@ public class PersonServlet extends HttpServlet {
         if (URL_ROOT.equals(request.getServletPath())) {
             request.setAttribute(ATTR_PEOPLE, personManager.findAllPeople());
             request.getRequestDispatcher(JSP_LIST).forward(request, response);
-        } if (URL_EDIT.equals(request.getServletPath())) {
+        } else if (URL_EDIT.equals(request.getServletPath())) {
             validateParameters(request, PARAM_ID);
 
             Long id = getLongParameter(request, PARAM_ID);
 
-            request.setAttribute(ATTR_PEOPLE, personManager.findAllPeople());
             request.setAttribute(ATTR_EDIT_PERSON, personManager.findPersonById(id));
+            request.setAttribute(ATTR_PEOPLE, personManager.findAllPeople());
 
             request.getRequestDispatcher(JSP_LIST).forward(request, response);
         }
