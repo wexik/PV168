@@ -13,6 +13,10 @@ public class Person {
     public Person() {
     }
 
+    public Person(Long id) {
+        this.id = id;
+    }
+
     public Person(Long id, String name, String phoneNumber, String address) {
 
         this.id = id;
