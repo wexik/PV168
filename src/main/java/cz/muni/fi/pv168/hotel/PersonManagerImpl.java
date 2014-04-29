@@ -18,8 +18,8 @@ import java.util.Map;
  */
 public class PersonManagerImpl extends NamedParameterJdbcTemplate implements PersonManager {
 
-    public static final String ATTR_PERSON_NAME = "person_name";
-    public static final String ATTR_PHONE_NUMBER = "phone_number";
+    public static final String ATTR_PERSON_NAME = "name";
+    public static final String ATTR_PHONE_NUMBER = "phonenumber";
     public static final String ATTR_ADDRESS = "address";
     public static final String ATTR_ID = "id";
     private DataSource dataSource;
@@ -45,7 +45,7 @@ public class PersonManagerImpl extends NamedParameterJdbcTemplate implements Per
 
         SimpleJdbcInsert simpleInsert =
                 new SimpleJdbcInsert(dataSource)
-                        .withTableName("person")
+                        .withTableName("persons")
                         .usingColumns(ATTR_PERSON_NAME, ATTR_PHONE_NUMBER, ATTR_ADDRESS)
                         .usingGeneratedKeyColumns(ATTR_ID);
         Number id = simpleInsert.executeAndReturnKey(params);
@@ -62,7 +62,7 @@ public class PersonManagerImpl extends NamedParameterJdbcTemplate implements Per
             throw new IllegalArgumentException("Person ID is null");
         }
 
-        int affectedRows = getJdbcOperations().update("DELETE FROM person WHERE id=?", person.getId());
+        int affectedRows = getJdbcOperations().update("DELETE FROM persons WHERE id=?", person.getId());
         if (affectedRows != 1) {
             throw new PersistenceException("Deleted rows " + affectedRows);
         }
@@ -70,7 +70,7 @@ public class PersonManagerImpl extends NamedParameterJdbcTemplate implements Per
 
     @Override
     public List<Person> findAllPeople() {
-        List<Map<String, Object>> maps = getJdbcOperations().queryForList("SELECT id, person_name, phone_number, address FROM person");
+        List<Map<String, Object>> maps = getJdbcOperations().queryForList("SELECT id, name, phonenumber, address FROM persons");
         return getPeopleFromMap(maps);
     }
 
@@ -98,7 +98,7 @@ public class PersonManagerImpl extends NamedParameterJdbcTemplate implements Per
 
         Person person = null;
         try {
-            person = getJdbcOperations().queryForObject("SELECT id, person_name, phone_number, address FROM person WHERE id=?", new PersonMapper(), id);
+            person = getJdbcOperations().queryForObject("SELECT id, name, phonenumber, address FROM persons WHERE id=?", new PersonMapper(), id);
         } catch (EmptyResultDataAccessException e) {
             // LOG exception and do nothing, null will be returned
         }
@@ -120,7 +120,7 @@ public class PersonManagerImpl extends NamedParameterJdbcTemplate implements Per
         params.put(ATTR_PHONE_NUMBER, person.getPhoneNumber());
         params.put(ATTR_ADDRESS, person.getAddress());
 
-        int affectedRows = getJdbcOperations().update("UPDATE person SET person_name=?, phone_number=?, address=? WHERE id=?",
+        int affectedRows = getJdbcOperations().update("UPDATE persons SET name=?, phonenumber=?, address=? WHERE id=?",
                 person.getName(), person.getPhoneNumber(), person.getAddress(), person.getId());
         if (affectedRows != 1) {
             throw new PersistenceException("Update rows " + affectedRows);

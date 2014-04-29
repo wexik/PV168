@@ -1,8 +1,20 @@
 package cz.muni.fi.pv168.hotel;
 
+import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -15,13 +27,13 @@ public class Main {
 
     public static void main(String[] args) throws RoomException, IOException, SQLException {
 
-        EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
-        EmbeddedDatabase db = builder.setType(EmbeddedDatabaseType.HSQL).addScript("init.sql").build();
+//        EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
+//        EmbeddedDatabase db = builder.setType(EmbeddedDatabaseType.HSQL).addScript("init.sql").build();
+//
+//        PersonManager personManager = new PersonManagerImpl(db);
 
-        PersonManager personManager = new PersonManagerImpl(db);
-
-        /*ApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfig.class);
-        RoomManager roomManager = ctx.getBean(RoomManager.class);*/
+        ApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfig.class);
+        //RoomManager roomManager = ctx.getBean(RoomManager.class);
 
 //        RoomManager roomManager = new RoomManagerImpl(getDateSource());
 
@@ -42,7 +54,7 @@ public class Main {
         return s.hasNext() ? s.next() : "";
     }
 
-    /*@Configuration
+    @Configuration
     @EnableTransactionManagement
     @PropertySource("classpath:myconf.properties")
     public static class SpringConfig {
@@ -54,6 +66,7 @@ public class Main {
         public DataSource dataSource() {
             BasicDataSource bds = new BasicDataSource(); //Apache DBCP connection pooling DataSource
             bds.setUrl(env.getProperty("jdbc.url"));
+            bds.setDriverClassName("org.apache.derby.jdbc.ClientDriver");
             bds.setUsername(env.getProperty("jdbc.user"));
             bds.setPassword(env.getProperty("jdbc.password"));
             return bds;
@@ -76,14 +89,14 @@ public class Main {
 
         @Bean
         public RentManager rentManager() {
-            RentManagerImpl leaseManager = new RentManagerImpl(dataSource());
+            RentManagerImpl rentManager = new RentManagerImpl(dataSource());
             rentManager.setRoomManager(roomManager());
             rentManager.setPersonManager(personManager());
-            return leaseManager;
+            return rentManager;
         }
-    }*/
+    }
 
-    public static DataSource getDateSource(){
+    /*public static DataSource getDateSource(){
 //        Properties myConf = new Properties();
 //
 //        try {
@@ -104,6 +117,6 @@ public class Main {
 
         return build;
     }
-
+*/
     //ahoj
 }

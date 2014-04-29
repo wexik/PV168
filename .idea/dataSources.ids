@@ -258,32 +258,32 @@
       <column name="IBMREQD" sqlType="CHAR" precision="1" scale="0" nullable="true" jdbcType="1"/>
     </table>
     <table name="PERSONS" schema="WEXIK" catalog="" type="TABLE">
-      <column name="ID" sqlType="INTEGER" precision="10" scale="0" nullable="false" jdbcType="4" def="QVVUT0lOQ1JFTUVOVDogc3RhcnQgMSBpbmNyZW1lbnQgMQ==" autoIncrement="true"/>
+      <column name="ID" sqlType="BIGINT" precision="19" scale="0" nullable="false" jdbcType="-5" def="QVVUT0lOQ1JFTUVOVDogc3RhcnQgMSBpbmNyZW1lbnQgMQ==" autoIncrement="true"/>
       <column name="NAME" sqlType="VARCHAR" precision="50" scale="0" nullable="true" jdbcType="12"/>
       <column name="PHONENUMBER" sqlType="VARCHAR" precision="20" scale="0" nullable="true" jdbcType="12"/>
       <column name="ADDRESS" sqlType="VARCHAR" precision="150" scale="0" nullable="true" jdbcType="12"/>
-      <primary-key name="SQL140330133552650" columns="ID"/>
-      <exported-key name="SQL140330163810422" table="RENTS" schema="WEXIK" catalog="" columns="PERSONID"/>
+      <primary-key name="PERSONS_PK" columns="ID"/>
+      <exported-key name="SQL140408010556552" table="RENTS" schema="WEXIK" catalog="" columns="PERSONID"/>
     </table>
     <table name="RENTS" schema="WEXIK" catalog="" type="TABLE">
       <column name="ID" sqlType="BIGINT" precision="19" scale="0" nullable="false" jdbcType="-5" def="QVVUT0lOQ1JFTUVOVDogc3RhcnQgMSBpbmNyZW1lbnQgMQ==" autoIncrement="true"/>
+      <column name="PRICE" sqlType="DECIMAL" precision="5" scale="0" nullable="true" jdbcType="3"/>
       <column name="ROOMID" sqlType="INTEGER" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="PERSONID" sqlType="INTEGER" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="PERSONID" sqlType="BIGINT" precision="19" scale="0" nullable="true" jdbcType="-5"/>
       <column name="STARTDAY" sqlType="DATE" precision="10" scale="0" nullable="true" jdbcType="91"/>
       <column name="EXPECTEDENDDAY" sqlType="DATE" precision="10" scale="0" nullable="true" jdbcType="91"/>
       <column name="REALENDDAY" sqlType="TIMESTAMP" precision="29" scale="9" nullable="true" jdbcType="93"/>
-      <column name="PRICE" sqlType="DECIMAL" precision="5" scale="0" nullable="true" jdbcType="3"/>
       <column name="COUNTOGUESTSINROOM" sqlType="INTEGER" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <primary-key name="SQL140330163810420" columns="ID"/>
-      <foreign-key name="SQL140330163810422" columns="PERSONID" ref-table="PERSONS" ref-schema="WEXIK" ref-catalog="" ref-columns="ID" update-rule="3" delete-rule="0" deferrability="2"/>
-      <foreign-key name="SQL140330163810421" columns="ROOMID" ref-table="ROOMS" ref-schema="WEXIK" ref-catalog="" ref-columns="ID" update-rule="3" delete-rule="0" deferrability="2"/>
+      <primary-key name="SQL140408010556550" columns="ID"/>
+      <foreign-key name="SQL140408010556552" columns="PERSONID" ref-table="PERSONS" ref-schema="WEXIK" ref-catalog="" ref-columns="ID" update-rule="3" delete-rule="0" deferrability="2"/>
+      <foreign-key name="SQL140408010556551" columns="ROOMID" ref-table="ROOMS" ref-schema="WEXIK" ref-catalog="" ref-columns="ID" update-rule="3" delete-rule="0" deferrability="2"/>
     </table>
     <table name="ROOMS" schema="WEXIK" catalog="" type="TABLE">
       <column name="ID" sqlType="INTEGER" precision="10" scale="0" nullable="false" jdbcType="4" def="QVVUT0lOQ1JFTUVOVDogc3RhcnQgMSBpbmNyZW1lbnQgMQ==" autoIncrement="true"/>
       <column name="CAPACITY" sqlType="INTEGER" precision="10" scale="0" nullable="true" jdbcType="4"/>
       <column name="PRICEPERDAY" sqlType="DECIMAL" precision="8" scale="3" nullable="true" jdbcType="3"/>
       <primary-key name="SQL140321173014930" columns="ID"/>
-      <exported-key name="SQL140330163810421" table="RENTS" schema="WEXIK" catalog="" columns="ROOMID"/>
+      <exported-key name="SQL140408010556551" table="RENTS" schema="WEXIK" catalog="" columns="ROOMID"/>
     </table>
     <procedure name="INSTALL_JAR" schema="SQLJ" catalog="" type="1" remarks="b3JnLmFwYWNoZS5kZXJieS5jYXRhbG9nLlN5c3RlbVByb2NlZHVyZXMuSU5TVEFMTF9KQVI=">
       <prototype>

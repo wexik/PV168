@@ -5,7 +5,12 @@
         </encoder>
     </appender>
     <!-- naše vlastní třídy -->
-    <logger name="cz.muni.fi.pv168.books" level="debug"/>
+    <logger name="cz.muni.fi.pv168.hotel.RoomManagerImpl" level="debug"/>
+    <logger name="cz.muni.fi.pv168.hotel.RentManagerImpl" level="debug"/>
+    <logger name="cz.muni.fi.pv168.hotel.PersonManagerImpl" level="debug"/>
+    <logger name="cz.muni.fi.pv168.hotel.Room" level="debug"/>
+    <logger name="cz.muni.fi.pv168.hotel.Rent" level="debug"/>
+    <logger name="cz.muni.fi.pv168.hotel.Person" level="debug"/>
     <!-- transakce -->
     <logger name="corg.springframework.transaction" level="debug"/>
     <logger name="org.springframework.jdbc.datasource.DataSourceTransactionManager" level="debug" />
