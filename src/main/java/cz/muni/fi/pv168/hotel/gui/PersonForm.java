@@ -21,6 +21,7 @@ import java.util.List;
 public class PersonForm extends JPanel {
 
     private static final int CHECK_COLUMN_INDEX = 3;
+    private static final int ID_COLUMN_INDEX = -1;
     private PersonManager personManager;
     private Long currentlyUpdatedPersonId = null;
     
@@ -124,7 +125,7 @@ public class PersonForm extends JPanel {
             Boolean isChecked = (Boolean) personTable.getModel().getValueAt(i, CHECK_COLUMN_INDEX);
 
             if (isChecked) {
-                Person person = (Person) personTable.getModel().getValueAt(i, -1);
+                Person person = (Person) personTable.getModel().getValueAt(i, ID_COLUMN_INDEX);
                 checkedPeople.add(person);
             }
         }
