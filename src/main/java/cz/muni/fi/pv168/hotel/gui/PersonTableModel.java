@@ -77,13 +77,13 @@ public class PersonTableModel implements TableModel {
     public String getColumnName(int column) {
         switch (column) {
             case 0:
-                return "Name";
+                return ResourceBundleProvider.getMessage("person.name");
             case 1:
-                return "Address";
+                return ResourceBundleProvider.getMessage("person.address");
             case 2:
-                return "Phone";
+                return ResourceBundleProvider.getMessage("person.phone");
             case 3:
-                return "Check";
+                return ResourceBundleProvider.getMessage("person.table.check");
             default:
                 throw new IndexOutOfBoundsException("No column name for index " + column);
         }

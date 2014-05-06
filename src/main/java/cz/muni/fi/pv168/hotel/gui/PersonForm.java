@@ -9,6 +9,8 @@ import cz.muni.fi.pv168.hotel.util.StringUtils;
 
 import javax.sql.DataSource;
 import javax.swing.*;
+import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -54,6 +56,7 @@ public class PersonForm extends JPanel {
                 }
             }
         });
+        cancelButton.setText(ResourceBundleProvider.getMessage("button.cancel"));
 
         updateButton.addActionListener(new ActionListener() {
             @Override
@@ -61,14 +64,15 @@ public class PersonForm extends JPanel {
                 List<Person> checkedPeople = getCheckedPeople();
 
                 if (checkedPeople.isEmpty()) {
-                    JOptionPane.showMessageDialog(PersonForm.this, "You have to select a person which to update");
+                    JOptionPane.showMessageDialog(PersonForm.this, ResourceBundleProvider.getMessage("error.noselected"));
                 } else if (checkedPeople.size() > 1) {
-                    JOptionPane.showMessageDialog(PersonForm.this, "Please select only one person for update.");
+                    JOptionPane.showMessageDialog(PersonForm.this, ResourceBundleProvider.getMessage("error.moreselected"));
                 } else {
                     setFieldValues(checkedPeople.get(0));
                 }
             }
         });
+        updateButton.setText(ResourceBundleProvider.getMessage("button.update"));
 
         okButton.addActionListener(new ActionListener() {
             @Override
@@ -86,16 +90,17 @@ public class PersonForm extends JPanel {
                     String message;
                     if (person.getId() == null) {
                         new CreatePersonWorker(person).execute();
-                        message = "Person " + person.getName() + " successfuly created";
+                        message = ResourceBundleProvider.getMessage("person.msg.create.success", person.getName());
                     } else {
                         new UpdateActionPersonWorker(person).execute();
-                        message = "Person " + person.getName() + " successfuly updated";
+                        message = ResourceBundleProvider.getMessage("person.msg.update.success", person.getName());
                     }
 
                     JOptionPane.showMessageDialog(PersonForm.this, message);
                 }
             }
         });
+        okButton.setText(ResourceBundleProvider.getMessage("button.ok"));
 
         deleteButton.addActionListener(new ActionListener() {
             @Override
@@ -103,17 +108,22 @@ public class PersonForm extends JPanel {
                 List<Person> checkedPeople = getCheckedPeople();
 
                 if (checkedPeople.isEmpty()) {
-                    JOptionPane.showMessageDialog(PersonForm.this, "You have to check some people first");
+                    JOptionPane.showMessageDialog(PersonForm.this, ResourceBundleProvider.getMessage("error.noselected"));
                     return;
                 }
 
-                int chosenOption = JOptionPane.showConfirmDialog(PersonForm.this, "Do you really want to remove all selected people (" + checkedPeople.size() + ")?", null, JOptionPane.YES_NO_OPTION);
+                int chosenOption = JOptionPane.showConfirmDialog(PersonForm.this, ResourceBundleProvider.getMessage("person.delete.question", checkedPeople.size()), null, JOptionPane.YES_NO_OPTION);
                 if (chosenOption == JOptionPane.YES_OPTION) {
                     new DeleteActionPersonWorker(checkedPeople).execute();
                 }
             }
         });
+        deleteButton.setText(ResourceBundleProvider.getMessage("button.delete"));
 
+        nameLabel.setText(ResourceBundleProvider.getMessage("person.name"));
+        addressLabel.setText(ResourceBundleProvider.getMessage("person.address"));
+        phoneLabel.setText(ResourceBundleProvider.getMessage("person.phone"));
+        personTable.setTableHeader(new JTableHeader(new DefaultTableColumnModel()));
 
         reloadPersonTable();
     }
@@ -194,9 +204,9 @@ public class PersonForm extends JPanel {
                 inputVerifier.shouldYieldFocus(fields[i]); // colorify input field
 
                 if (inputVerifier instanceof NumericRequiredInputVerifier) {
-                    errors.add("Field " + labels[i].getText() + " is mandatory and has to be number.");
+                    errors.add(ResourceBundleProvider.getMessage("error.number", labels[i].getText()));
                 } else if (inputVerifier instanceof RequiredInputVerifier) {
-                    errors.add("Field " + labels[i].getText() + " is mandatory.");
+                    errors.add(ResourceBundleProvider.getMessage("error.mandatory", labels[i].getText()));
                 }
             }
         }
@@ -205,7 +215,6 @@ public class PersonForm extends JPanel {
     }
 
     private void createUIComponents() {
-        // TODO: place custom component creation code here
     }
 
 
