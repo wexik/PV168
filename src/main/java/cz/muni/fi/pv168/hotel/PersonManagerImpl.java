@@ -1,5 +1,7 @@
 package cz.muni.fi.pv168.hotel;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -18,6 +20,8 @@ import java.util.Map;
  */
 public class PersonManagerImpl extends NamedParameterJdbcTemplate implements PersonManager {
 
+    Logger logger = LoggerFactory.getLogger(PersonManagerImpl.class);
+
     public static final String ATTR_PERSON_NAME = "PERSON_NAME";
     public static final String ATTR_PHONE_NUMBER = "PHONE_NUMBER";
     public static final String ATTR_ADDRESS = "ADDRESS";
@@ -33,6 +37,9 @@ public class PersonManagerImpl extends NamedParameterJdbcTemplate implements Per
 
     @Override
     public void createPerson(Person person) {
+
+        logger.info("Creating new person {}", person);
+
         if (person == null) {
             throw new IllegalArgumentException("Person is null");
         }
@@ -57,6 +64,9 @@ public class PersonManagerImpl extends NamedParameterJdbcTemplate implements Per
 
     @Override
     public void deletePerson(Person person) {
+
+        logger.info("Removing person {}", person);
+
         if (person == null) {
             throw new IllegalArgumentException("Person is null");
         }
@@ -66,12 +76,16 @@ public class PersonManagerImpl extends NamedParameterJdbcTemplate implements Per
 
         int affectedRows = getJdbcOperations().update("DELETE FROM " + TABLE_NAME + " WHERE " + ATTR_ID + "=?", person.getId());
         if (affectedRows != 1) {
-            throw new PersistenceException("Deleted rows " + affectedRows);
+            logger.error("Delete statement affected {} rows, expected 1, while removing person {}", affectedRows, person);
+            throw new PersistenceException("Delete statement affected " + affectedRows + " rows, expected 1, while removing person " + person.toString());
         }
     }
 
     @Override
     public List<Person> findAllPeople() {
+
+        logger.info("Retrieving all people");
+
         List<Map<String, Object>> maps = getJdbcOperations().queryForList(
                 "SELECT " + ATTR_ID + ", " + ATTR_PERSON_NAME + ", " + ATTR_PHONE_NUMBER + ", " + ATTR_ADDRESS +
                 " FROM " + TABLE_NAME
@@ -98,6 +112,9 @@ public class PersonManagerImpl extends NamedParameterJdbcTemplate implements Per
 
     @Override
     public Person findPersonById(Long id) {
+
+        logger.info("Searching for person with id {}", id);
+
         if (id == null) {
             throw new IllegalArgumentException("ID is null");
         }
@@ -109,13 +126,17 @@ public class PersonManagerImpl extends NamedParameterJdbcTemplate implements Per
                             " FROM " + TABLE_NAME + " WHERE " + ATTR_ID + "=?", new PersonMapper(), id
             );
         } catch (EmptyResultDataAccessException e) {
-            // LOG exception and do nothing, null will be returned
+            logger.warn("No person with ID " + id + " was found", e);
         }
+
         return person;
     }
 
     @Override
     public void updatePerson(Person person) {
+
+        logger.info("Updating person {}", person);
+
         if (person == null) {
             throw new IllegalArgumentException("Person is null");
         }
@@ -128,7 +149,8 @@ public class PersonManagerImpl extends NamedParameterJdbcTemplate implements Per
                 person.getName(), person.getPhoneNumber(), person.getAddress(), person.getId());
 
         if (affectedRows != 1) {
-            throw new PersistenceException("Update rows " + affectedRows);
+            logger.error("Update statement affected {} rows, expected 1, while updating person {}", affectedRows, person);
+            throw new PersistenceException("Update statement affected " + affectedRows + " rows, expected 1, while updating person " + person.toString());
         }
     }
 
