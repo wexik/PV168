@@ -38,100 +38,6 @@ public class PersonForm extends JPanel {
     private JTextField phoneField;
 
 
-    private abstract class ActionPersonWorker<T> extends SafeSwingWorker<Void, Void> {
-
-        private T input;
-
-        private ActionPersonWorker(T input) {
-            this.input = input;
-        }
-
-        protected T getInput() {
-            return input;
-        }
-
-        @Override
-        protected void done() {
-            currentlyUpdatedPersonId = null;
-            clearAllFields();
-            reloadPersonTable();
-        }
-    }
-
-    private class CreatePersonWorker extends ActionPersonWorker<Person> {
-
-        private CreatePersonWorker(Person person) {
-            super(person);
-        }
-
-        @Override
-        protected Void doInBackground() throws Exception {
-            personManager.createPerson(getInput());
-            return null;
-        }
-    }
-
-    private class UpdateActionPersonWorker extends ActionPersonWorker<Person> {
-
-        private UpdateActionPersonWorker(Person person) {
-            super(person);
-        }
-
-        @Override
-        protected Void doInBackground() throws Exception {
-            personManager.updatePerson(getInput());
-            return null;
-        }
-    }
-
-    private class DeleteActionPersonWorker extends ActionPersonWorker<List<Person>> {
-
-        private DeleteActionPersonWorker(List<Person> people) {
-            super(people);
-        }
-
-        @Override
-        protected Void doInBackground() throws Exception {
-            for (Person person : getInput()) {
-                personManager.deletePerson(person);
-            }
-            return null;
-        }
-    }
-
-    private class LoadAllPersonWorker extends SafeSwingWorker<List<Person>, Void> {
-
-        @Override
-        protected List<Person> doInBackground() throws Exception {
-            return personManager.findAllPeople();
-        }
-
-        @Override
-        protected void done() {
-            personTable.setModel(new PersonTableModel(safeGet()));
-            personTable.repaint();
-        }
-    }
-
-    private class LoadPersonWorker extends SafeSwingWorker<Person, Void> {
-
-        private Long personId;
-
-        private LoadPersonWorker(Long personId) {
-            this.personId = personId;
-        }
-
-        @Override
-        protected Person doInBackground() throws Exception {
-            return personManager.findPersonById(personId);
-        }
-
-        @Override
-        protected void done() {
-            setFieldValues(safeGet());
-        }
-    }
-
     public PersonForm() {
 
         initManagers();
@@ -148,23 +54,10 @@ public class PersonForm extends JPanel {
             }
         });
 
-
         updateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int rowCount = personTable.getModel().getRowCount();
-
-                List<Integer> checkedIndices = new ArrayList<>();
-                List<Person> checkedPeople = new ArrayList<>();
-                for (int i = 0; i < rowCount; i++) {
-                    Boolean isChecked = (Boolean) personTable.getModel().getValueAt(i, CHECK_COLUMN_INDEX);
-
-                    if (isChecked) {
-                        Person person = (Person) personTable.getModel().getValueAt(i, -1);
-                        checkedIndices.add(i);
-                        checkedPeople.add(person);
-                    }
-                }
+                List<Person> checkedPeople = getCheckedPeople();
 
                 if (checkedPeople.isEmpty()) {
                     JOptionPane.showMessageDialog(PersonForm.this, "You have to select a person which to update");
@@ -172,7 +65,6 @@ public class PersonForm extends JPanel {
                     JOptionPane.showMessageDialog(PersonForm.this, "Please select only one person for update.");
                 } else {
                     setFieldValues(checkedPeople.get(0));
-
                 }
             }
         });
@@ -189,19 +81,14 @@ public class PersonForm extends JPanel {
                     JOptionPane.showMessageDialog(PersonForm.this, StringUtils.printDelimited(errors, "\n"));
                 } else {
 
-                    Long id = currentlyUpdatedPersonId;
-                    String name = nameField.getText();
-                    String phone = phoneField.getText();
-                    String address = addressField.getText();
-
-                    Person person = new Person(id, name, phone, address);
+                    Person person = assemblePersonFromInput();
                     String message;
-                    if (id == null) {
+                    if (person.getId() == null) {
                         new CreatePersonWorker(person).execute();
-                        message = "Person " + name + " successfuly created";
+                        message = "Person " + person.getName() + " successfuly created";
                     } else {
                         new UpdateActionPersonWorker(person).execute();
-                        message = "Person " + name + " successfuly updated";
+                        message = "Person " + person.getName() + " successfuly updated";
                     }
 
                     JOptionPane.showMessageDialog(PersonForm.this, message);
@@ -212,34 +99,59 @@ public class PersonForm extends JPanel {
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int rowCount = personTable.getModel().getRowCount();
+                List<Person> checkedPeople = getCheckedPeople();
 
-                List<Integer> removedIndexes = new ArrayList<>();
-                List<Person> toDelete = new ArrayList<>();
-                for (int i = 0; i < rowCount; i++) {
-                    Boolean isChecked = (Boolean) personTable.getModel().getValueAt(i, CHECK_COLUMN_INDEX);
-
-                    if (isChecked) {
-                        Person person = (Person) personTable.getModel().getValueAt(i, -1);
-                        removedIndexes.add(i);
-                        toDelete.add(person);
-                    }
-                }
-
-                if (toDelete.isEmpty()) {
+                if (checkedPeople.isEmpty()) {
                     JOptionPane.showMessageDialog(PersonForm.this, "You have to check some people first");
                     return;
                 }
 
-                int chosenOption = JOptionPane.showConfirmDialog(PersonForm.this, "Do you really want to remove all selected people (" + toDelete.size() + ")?", null, JOptionPane.YES_NO_OPTION);
+                int chosenOption = JOptionPane.showConfirmDialog(PersonForm.this, "Do you really want to remove all selected people (" + checkedPeople.size() + ")?", null, JOptionPane.YES_NO_OPTION);
                 if (chosenOption == JOptionPane.YES_OPTION) {
-                    new DeleteActionPersonWorker(toDelete).execute();
+                    new DeleteActionPersonWorker(checkedPeople).execute();
                 }
             }
         });
 
 
         reloadPersonTable();
+    }
+
+    private List<Person> getCheckedPeople() {
+        int rowCount = personTable.getModel().getRowCount();
+        List<Person> checkedPeople = new ArrayList<>();
+        for (int i = 0; i < rowCount; i++) {
+            Boolean isChecked = (Boolean) personTable.getModel().getValueAt(i, CHECK_COLUMN_INDEX);
+
+            if (isChecked) {
+                Person person = (Person) personTable.getModel().getValueAt(i, -1);
+                checkedPeople.add(person);
+            }
+        }
+        return checkedPeople;
+    }
+
+    private Person assemblePersonFromInput() {
+        Long id = currentlyUpdatedPersonId;
+        String name = nameField.getText();
+        String phone = phoneField.getText();
+        String address = addressField.getText();
+
+        return new Person(id, name, phone, address);
+    }
+
+    private DataSource getDataSource() {
+        return DataSourceProvider.getDataSource();
+    }
+
+    private void initManagers() {
+        personManager = new PersonManagerImpl(getDataSource());
+    }
+
+    private void initVerifiers() {
+        nameField.setInputVerifier(new RequiredInputVerifier());
+        addressField.setInputVerifier(new RequiredInputVerifier());
+        phoneField.setInputVerifier(new NumericRequiredInputVerifier());
     }
 
     private void setFieldValues(Person person) {
@@ -253,16 +165,6 @@ public class PersonForm extends JPanel {
         clearFields(nameField, phoneField, addressField);
     }
 
-    private void initVerifiers() {
-        nameField.setInputVerifier(new RequiredInputVerifier());
-        addressField.setInputVerifier(new RequiredInputVerifier());
-        phoneField.setInputVerifier(new NumericRequiredInputVerifier());
-    }
-
-    private void reloadPersonTable() {
-        new LoadAllPersonWorker().execute();
-    }
-
     private void clearFields(JTextField ... fields) {
         for (JTextField field : fields) {
             field.setText("");
@@ -270,6 +172,13 @@ public class PersonForm extends JPanel {
         }
     }
 
+    private void reloadPersonTable() {
+        new LoadAllPersonWorker().execute();
+    }
+
+    /**
+     * Validates fields, paints background if error occures, returns error messages
+     */
     private List<String> validateFields(JTextField[] fields, JLabel[] labels) {
 
         if (fields.length != labels.length) {
@@ -294,16 +203,123 @@ public class PersonForm extends JPanel {
         return errors;
     }
 
-
-    private DataSource getDataSource() {
-        return DataSourceProvider.getDataSource();
-    }
-
-    private void initManagers() {
-        personManager = new PersonManagerImpl(getDataSource());
-    }
-    
     private void createUIComponents() {
         // TODO: place custom component creation code here
+    }
+
+
+    /**
+     * Abstract swing worker for doing create/update/delete action method and refreshing
+     * person table and input fields
+     *
+     * @param <T> type of input parameter of action method
+     */
+    private abstract class ActionPersonWorker<T> extends SafeSwingWorker<Void, Void> {
+
+        private T input;
+
+        private ActionPersonWorker(T input) {
+            this.input = input;
+        }
+
+        protected T getInput() {
+            return input;
+        }
+
+        @Override
+        protected void done() {
+            currentlyUpdatedPersonId = null;
+            clearAllFields();
+            reloadPersonTable();
+        }
+    }
+
+    /**
+     * Swing worker for creating person
+     */
+    private class CreatePersonWorker extends ActionPersonWorker<Person> {
+
+        private CreatePersonWorker(Person person) {
+            super(person);
+        }
+
+        @Override
+        protected Void doInBackground() throws Exception {
+            personManager.createPerson(getInput());
+            return null;
+        }
+    }
+
+    /**
+     * Swing worker for updating person
+     */
+    private class UpdateActionPersonWorker extends ActionPersonWorker<Person> {
+
+        private UpdateActionPersonWorker(Person person) {
+            super(person);
+        }
+
+        @Override
+        protected Void doInBackground() throws Exception {
+            personManager.updatePerson(getInput());
+            return null;
+        }
+    }
+
+    /**
+     * Swing worker for deleting person
+     */
+    private class DeleteActionPersonWorker extends ActionPersonWorker<List<Person>> {
+
+        private DeleteActionPersonWorker(List<Person> people) {
+            super(people);
+        }
+
+        @Override
+        protected Void doInBackground() throws Exception {
+            for (Person person : getInput()) {
+                personManager.deletePerson(person);
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Swing worker for loading all people
+     */
+    private class LoadAllPersonWorker extends SafeSwingWorker<List<Person>, Void> {
+
+        @Override
+        protected List<Person> doInBackground() throws Exception {
+            return personManager.findAllPeople();
+        }
+
+        @Override
+        protected void done() {
+            personTable.setModel(new PersonTableModel(safeGet()));
+            personTable.repaint();
+        }
+    }
+
+    /**
+     * Swing worker for loading person by ID
+     */
+    private class LoadPersonWorker extends SafeSwingWorker<Person, Void> {
+
+        private Long personId;
+
+        private LoadPersonWorker(Long personId) {
+            this.personId = personId;
+        }
+
+        @Override
+        protected Person doInBackground() throws Exception {
+            return personManager.findPersonById(personId);
+        }
+
+        @Override
+        protected void done() {
+            setFieldValues(safeGet());
+        }
     }
 }
