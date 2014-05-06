@@ -18,10 +18,12 @@ import java.util.Map;
  */
 public class PersonManagerImpl extends NamedParameterJdbcTemplate implements PersonManager {
 
-    public static final String ATTR_PERSON_NAME = "name";
-    public static final String ATTR_PHONE_NUMBER = "phonenumber";
-    public static final String ATTR_ADDRESS = "address";
-    public static final String ATTR_ID = "id";
+    public static final String ATTR_PERSON_NAME = "PERSON_NAME";
+    public static final String ATTR_PHONE_NUMBER = "PHONE_NUMBER";
+    public static final String ATTR_ADDRESS = "ADDRESS";
+    public static final String ATTR_ID = "ID";
+    public static final String TABLE_NAME = "PERSONS";
+
     private DataSource dataSource;
 
     public PersonManagerImpl(DataSource dataSource) {
@@ -45,7 +47,7 @@ public class PersonManagerImpl extends NamedParameterJdbcTemplate implements Per
 
         SimpleJdbcInsert simpleInsert =
                 new SimpleJdbcInsert(dataSource)
-                        .withTableName("persons")
+                        .withTableName(TABLE_NAME)
                         .usingColumns(ATTR_PERSON_NAME, ATTR_PHONE_NUMBER, ATTR_ADDRESS)
                         .usingGeneratedKeyColumns(ATTR_ID);
         Number id = simpleInsert.executeAndReturnKey(params);
@@ -62,7 +64,7 @@ public class PersonManagerImpl extends NamedParameterJdbcTemplate implements Per
             throw new IllegalArgumentException("Person ID is null");
         }
 
-        int affectedRows = getJdbcOperations().update("DELETE FROM persons WHERE id=?", person.getId());
+        int affectedRows = getJdbcOperations().update("DELETE FROM " + TABLE_NAME + " WHERE " + ATTR_ID + "=?", person.getId());
         if (affectedRows != 1) {
             throw new PersistenceException("Deleted rows " + affectedRows);
         }
@@ -70,7 +72,11 @@ public class PersonManagerImpl extends NamedParameterJdbcTemplate implements Per
 
     @Override
     public List<Person> findAllPeople() {
-        List<Map<String, Object>> maps = getJdbcOperations().queryForList("SELECT id, name, phonenumber, address FROM persons");
+        List<Map<String, Object>> maps = getJdbcOperations().queryForList(
+                "SELECT " + ATTR_ID + ", " + ATTR_PERSON_NAME + ", " + ATTR_PHONE_NUMBER + ", " + ATTR_ADDRESS +
+                " FROM " + TABLE_NAME
+        );
+
         return getPeopleFromMap(maps);
     }
 
@@ -98,7 +104,10 @@ public class PersonManagerImpl extends NamedParameterJdbcTemplate implements Per
 
         Person person = null;
         try {
-            person = getJdbcOperations().queryForObject("SELECT id, name, phonenumber, address FROM persons WHERE id=?", new PersonMapper(), id);
+            person = getJdbcOperations().queryForObject(
+                    "SELECT " + ATTR_ID + ", " + ATTR_PERSON_NAME + ", " + ATTR_PHONE_NUMBER + ", " + ATTR_ADDRESS +
+                            " FROM " + TABLE_NAME + " WHERE " + ATTR_ID + "=?", new PersonMapper(), id
+            );
         } catch (EmptyResultDataAccessException e) {
             // LOG exception and do nothing, null will be returned
         }
@@ -114,14 +123,10 @@ public class PersonManagerImpl extends NamedParameterJdbcTemplate implements Per
             throw new IllegalArgumentException("Person ID is null");
         }
 
-        Map<String, Object> params = new HashMap<>();
-        params.put(ATTR_ID, person.getId());
-        params.put(ATTR_PERSON_NAME, person.getName());
-        params.put(ATTR_PHONE_NUMBER, person.getPhoneNumber());
-        params.put(ATTR_ADDRESS, person.getAddress());
-
-        int affectedRows = getJdbcOperations().update("UPDATE persons SET name=?, phonenumber=?, address=? WHERE id=?",
+        int affectedRows = getJdbcOperations().update(
+                "UPDATE " + TABLE_NAME + " SET " + ATTR_PERSON_NAME + "=?, " + ATTR_PHONE_NUMBER + "=?, " + ATTR_ADDRESS + "=? WHERE " + ATTR_ID + "=?",
                 person.getName(), person.getPhoneNumber(), person.getAddress(), person.getId());
+
         if (affectedRows != 1) {
             throw new PersistenceException("Update rows " + affectedRows);
         }
