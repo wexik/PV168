@@ -9,7 +9,11 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 import java.math.BigDecimal;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Created by wExiik on 5.3.2014.
@@ -25,7 +29,7 @@ public class RoomManagerImplTest {
     @Before
     public void setUp() {
         EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
-        dataSource = builder.setType(EmbeddedDatabaseType.HSQL).addScript("init.sql").build();
+        dataSource = builder.setType(EmbeddedDatabaseType.HSQL).addScript("testdb-init.sql").build();
         manager = new RoomManagerImpl(dataSource);
     }
 

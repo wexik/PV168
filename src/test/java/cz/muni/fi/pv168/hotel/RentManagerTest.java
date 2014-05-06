@@ -11,7 +11,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Masha Shevchenko
@@ -32,7 +34,7 @@ public class RentManagerTest {
     @Before
     public void setUp() {
         EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
-        dataSource = builder.setType(EmbeddedDatabaseType.HSQL).addScript("init.sql").build();
+        dataSource = builder.setType(EmbeddedDatabaseType.HSQL).addScript("testdb-init.sql").build();
         rentManager = new RentManagerImpl(dataSource);
         roomManager = new RoomManagerImpl(dataSource);
         personManager = new PersonManagerImpl(dataSource);

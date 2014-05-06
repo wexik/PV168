@@ -7,7 +7,10 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 /**
  * @author Masha Shevchenko
@@ -22,7 +25,7 @@ public class PersonManagerImplTest {
     @Before
     public void setUp() {
         EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
-        dataSource = builder.setType(EmbeddedDatabaseType.HSQL).addScript("init.sql").build();
+        dataSource = builder.setType(EmbeddedDatabaseType.HSQL).addScript("testdb-init.sql").build();
         personManager = new PersonManagerImpl(dataSource);
     }
 
