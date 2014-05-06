@@ -22,6 +22,7 @@ public class PersonForm extends JPanel {
 
     private static final int CHECK_COLUMN_INDEX = 3;
     private PersonManager personManager;
+    private Long currentlyUpdatedPersonId = null;
     
     private JPanel panel1;
     private JLabel nameLabel;
@@ -39,14 +40,47 @@ public class PersonForm extends JPanel {
     public PersonForm() {
 
         initManagers();
-
-        nameField.setInputVerifier(new RequiredInputVerifier());
-        addressField.setInputVerifier(new RequiredInputVerifier());
-        phoneField.setInputVerifier(new NumericRequiredInputVerifier());
+        initVerifiers();
 
 
-        // TODO swing worker
-        final List<Person> people = personManager.findAllPeople();
+        cancelButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clearAllFields();
+                if (currentlyUpdatedPersonId != null) {
+                    setFieldValues(personManager.findPersonById(currentlyUpdatedPersonId));
+                }
+            }
+        });
+
+
+        updateButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int rowCount = personTable.getModel().getRowCount();
+
+                List<Integer> checkedIndices = new ArrayList<>();
+                List<Person> checkedPeople = new ArrayList<>();
+                for (int i = 0; i < rowCount; i++) {
+                    Boolean isChecked = (Boolean) personTable.getModel().getValueAt(i, CHECK_COLUMN_INDEX);
+
+                    if (isChecked) {
+                        Person person = (Person) personTable.getModel().getValueAt(i, -1);
+                        checkedIndices.add(i);
+                        checkedPeople.add(person);
+                    }
+                }
+
+                if (checkedPeople.isEmpty()) {
+                    JOptionPane.showMessageDialog(PersonForm.this, "You have to select a person which to update");
+                } else if (checkedPeople.size() > 1) {
+                    JOptionPane.showMessageDialog(PersonForm.this, "Please select only one person for update.");
+                } else {
+                    setFieldValues(checkedPeople.get(0));
+
+                }
+            }
+        });
 
         okButton.addActionListener(new ActionListener() {
             @Override
@@ -60,15 +94,26 @@ public class PersonForm extends JPanel {
                     JOptionPane.showMessageDialog(PersonForm.this, StringUtils.printDelimited(errors, "\n"));
                 } else {
 
+                    Long id = currentlyUpdatedPersonId;
                     String name = nameField.getText();
                     String phone = phoneField.getText();
                     String address = addressField.getText();
 
+                    Person person = new Person(id, name, phone, address);
+                    String message;
                     // TODO swing worker
-                    personManager.createPerson(new Person(null, name, phone, address));
+                    if (id == null) {
+                        personManager.createPerson(person);
+                        message = "Person " + name + " successfuly created";
+                    } else {
+                        personManager.updatePerson(person);
+                        currentlyUpdatedPersonId = null; // reset
+                        message = "Person " + name + " successfuly updated";
+                    }
 
-                    clearFields(nameField, phoneField, addressField);
-                    JOptionPane.showMessageDialog(PersonForm.this, "Person " + name + " successfuly created");
+                    clearAllFields();
+
+                    JOptionPane.showMessageDialog(PersonForm.this, message);
                     reloadPersonTable();
                 }
             }
@@ -80,7 +125,7 @@ public class PersonForm extends JPanel {
                 int rowCount = personTable.getModel().getRowCount();
 
                 List<Integer> removedIndexes = new ArrayList<>();
-                List<Person> toDelete = new ArrayList<Person>();
+                List<Person> toDelete = new ArrayList<>();
                 for (int i = 0; i < rowCount; i++) {
                     Boolean isChecked = (Boolean) personTable.getModel().getValueAt(i, CHECK_COLUMN_INDEX);
 
@@ -111,6 +156,23 @@ public class PersonForm extends JPanel {
 
         personTable.setModel(new PersonTableModel(personManager.findAllPeople()));
 
+    }
+
+    private void setFieldValues(Person person) {
+        nameField.setText(person.getName());
+        addressField.setText(person.getAddress());
+        phoneField.setText(person.getPhoneNumber());
+        currentlyUpdatedPersonId = person.getId();
+    }
+
+    private void clearAllFields() {
+        clearFields(nameField, phoneField, addressField);
+    }
+
+    private void initVerifiers() {
+        nameField.setInputVerifier(new RequiredInputVerifier());
+        addressField.setInputVerifier(new RequiredInputVerifier());
+        phoneField.setInputVerifier(new NumericRequiredInputVerifier());
     }
 
     private void reloadPersonTable() {
