@@ -5,7 +5,7 @@ import javax.swing.*;
 /**
  * @author kurocenko
  */
-public class RoomForm {
+public class RoomForm extends JPanel {
     private JTextField capacityField;
     private JTextField priceField;
     private JLabel capacityLabel;
