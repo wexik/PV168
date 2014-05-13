@@ -64,19 +64,19 @@
                   <text value="Number of people"/>
                 </properties>
               </component>
-              <component id="9e02e" class="javax.swing.JComboBox" binding="roomCombo">
+              <component id="9e02e" class="javax.swing.JComboBox" binding="roomCombo" custom-create="true">
                 <constraints>
                   <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties/>
               </component>
-              <component id="fdced" class="javax.swing.JComboBox" binding="personCombo">
+              <component id="fdced" class="javax.swing.JComboBox" binding="personCombo" custom-create="true">
                 <constraints>
                   <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties/>
               </component>
-              <component id="10a43" class="javax.swing.JComboBox" binding="numberCombo">
+              <component id="10a43" class="javax.swing.JComboBox" binding="numberCombo" custom-create="true">
                 <constraints>
                   <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>

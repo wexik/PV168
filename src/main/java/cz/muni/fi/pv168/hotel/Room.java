@@ -80,11 +80,6 @@ public class Room {
 
     @Override
     public String toString() {
-        return "Room{" +
-                "id=" + id +
-                ", capacity=" + capacity +
-                ", number=" + number +
-                ", pricePerDay=" + pricePerDay +
-                '}';
+        return String.valueOf(number);
     }
 }
