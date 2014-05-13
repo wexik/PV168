@@ -9,6 +9,7 @@ public class Room {
 
     private Long id;
     private int capacity;
+    private int number;
     private BigDecimal pricePerDay;
 
     public Room() {
@@ -44,6 +45,14 @@ public class Room {
         this.pricePerDay = pricePerDay;
     }
 
+    public int getNumber() {
+        return number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -52,17 +61,19 @@ public class Room {
         Room room = (Room) o;
 
         if (capacity != room.capacity) return false;
-        if (id != room.id) return false;
-        if (!pricePerDay.equals(room.pricePerDay)) return false;
+        if (number != room.number) return false;
+        if (id != null ? !id.equals(room.id) : room.id != null) return false;
+        if (pricePerDay != null ? !pricePerDay.equals(room.pricePerDay) : room.pricePerDay != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = id.intValue();
+        int result = id != null ? id.hashCode() : 0;
         result = 31 * result + capacity;
-        result = 31 * result + pricePerDay.hashCode();
+        result = 31 * result + number;
+        result = 31 * result + (pricePerDay != null ? pricePerDay.hashCode() : 0);
         return result;
     }
 
@@ -71,9 +82,8 @@ public class Room {
         return "Room{" +
                 "id=" + id +
                 ", capacity=" + capacity +
+                ", number=" + number +
                 ", pricePerDay=" + pricePerDay +
                 '}';
     }
-
-
 }
