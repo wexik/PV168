@@ -3,11 +3,13 @@ package cz.muni.fi.pv168.hotel.gui;
 import cz.muni.fi.pv168.hotel.Person;
 import cz.muni.fi.pv168.hotel.PersonManager;
 import cz.muni.fi.pv168.hotel.PersonManagerImpl;
+import cz.muni.fi.pv168.hotel.Rent;
 import cz.muni.fi.pv168.hotel.RentManager;
 import cz.muni.fi.pv168.hotel.RentManagerImpl;
 import cz.muni.fi.pv168.hotel.Room;
 import cz.muni.fi.pv168.hotel.RoomManager;
 import cz.muni.fi.pv168.hotel.RoomManagerImpl;
+import cz.muni.fi.pv168.hotel.gui.model.RentTableModel;
 import cz.muni.fi.pv168.hotel.gui.verifier.DateRequiredInputVerifier;
 import cz.muni.fi.pv168.hotel.gui.verifier.NumericRequiredInputVerifier;
 import cz.muni.fi.pv168.hotel.gui.verifier.RequiredInputVerifier;
@@ -18,6 +20,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +30,7 @@ import java.util.List;
  */
 public class RentForm extends JPanel {
 
-    private static final int CHECK_COLUMN_INDEX = 3;
+    private static final int CHECK_COLUMN_INDEX = 5;
     private static final int ID_COLUMN_INDEX = -1;
     private RentManager rentManager;
     private RoomManager roomManager;
@@ -47,9 +51,7 @@ public class RentForm extends JPanel {
     private JTextField endField;
     private JTable rentTable;
     private JButton deleteButton;
-    private JButton updateButton;
     private JButton okButton;
-    private JButton closeButton;
 
 
     public RentForm() {
@@ -57,33 +59,13 @@ public class RentForm extends JPanel {
         initVerifiers();
 
 
-
         cancelButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 clearAllFields();
-                if (currentlyUpdatedEntityId != null) {
-                    new LoadRoomWorker(currentlyUpdatedEntityId).execute();
-                }
             }
         });
         cancelButton.setText(ResourceBundleProvider.getMessage("button.cancel"));
-
-        updateButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                List<Room> checkedRooms = getCheckedRooms();
-
-                if (checkedRooms.isEmpty()) {
-                    JOptionPane.showMessageDialog(RentForm.this, ResourceBundleProvider.getMessage("error.noselected"));
-                } else if (checkedRooms.size() > 1) {
-                    JOptionPane.showMessageDialog(RentForm.this, ResourceBundleProvider.getMessage("error.moreselected"));
-                } else {
-                    setFieldValues(checkedRooms.get(0));
-                }
-            }
-        });
-        updateButton.setText(ResourceBundleProvider.getMessage("button.update"));
 
         okButton.addActionListener(new ActionListener() {
             @Override
@@ -97,15 +79,10 @@ public class RentForm extends JPanel {
                     JOptionPane.showMessageDialog(RentForm.this, StringUtils.printDelimited(errors, "\n"));
                 } else {
 
-                    Room room = assembleRoomFromInput();
+                    Rent room = assembleRentFromInput();
                     String message;
-                    if (room.getId() == null) {
-                        new CreateRoomWorker(room).execute();
-                        message = ResourceBundleProvider.getMessage("room.msg.create.success", room.getNumber());
-                    } else {
-                        new UpdateActionRoomWorker(room).execute();
-                        message = ResourceBundleProvider.getMessage("room.msg.update.success", room.getNumber());
-                    }
+                    new CreateRentWorker(room).execute();
+                    message = ResourceBundleProvider.getMessage("room.msg.create.success", room.getRoom().getNumber(), room.getPerson().getName());
 
                     JOptionPane.showMessageDialog(RentForm.this, message);
                 }
@@ -116,7 +93,7 @@ public class RentForm extends JPanel {
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                List<Room> checkedRooms = getCheckedRooms();
+                List<Rent> checkedRooms = getCheckedRents();
 
                 if (checkedRooms.isEmpty()) {
                     JOptionPane.showMessageDialog(RentForm.this, ResourceBundleProvider.getMessage("error.noselected"));
@@ -125,7 +102,7 @@ public class RentForm extends JPanel {
 
                 int chosenOption = JOptionPane.showConfirmDialog(RentForm.this, ResourceBundleProvider.getMessage("room.delete.question", checkedRooms.size()), null, JOptionPane.YES_NO_OPTION);
                 if (chosenOption == JOptionPane.YES_OPTION) {
-                    new DeleteActionRoomWorker(checkedRooms).execute();
+                    new DeleteActionRentWorker(checkedRooms).execute();
                 }
             }
         });
@@ -139,39 +116,42 @@ public class RentForm extends JPanel {
             }
         });
 
-        numberLabel.setText(ResourceBundleProvider.getMessage("room.number"));
-//        capacityLabel.setText(ResourceBundleProvider.getMessage("room.capacity"));
-//        priceLabel.setText(ResourceBundleProvider.getMessage("room.price"));
-//        rentTable.setTableHeader(new JTableHeader(new DefaultTableColumnModel()));
+        roomabel.setText(ResourceBundleProvider.getMessage("rent.room"));
+        personLabel.setText(ResourceBundleProvider.getMessage("rent.person"));
+        numberLabel.setText(ResourceBundleProvider.getMessage("rent.number"));
+        startLabel.setText(ResourceBundleProvider.getMessage("rent.start"));
+        endLabel.setText(ResourceBundleProvider.getMessage("rent.end"));
 
         new LoadAllPersonWorker().execute();
         new LoadAllRoomWorker().execute();
 
-        reloadRoomTable();
+        reloadRentTable();
     }
 
-    private List<Room> getCheckedRooms() {
+    private List<Rent> getCheckedRents() {
         int rowCount = rentTable.getModel().getRowCount();
-        List<Room> checkedRooms = new ArrayList<>();
+        List<Rent> checkedRentss = new ArrayList<>();
         for (int i = 0; i < rowCount; i++) {
             Boolean isChecked = (Boolean) rentTable.getModel().getValueAt(i, CHECK_COLUMN_INDEX);
 
             if (isChecked) {
-                Room room = (Room) rentTable.getModel().getValueAt(i, ID_COLUMN_INDEX);
-                checkedRooms.add(room);
+                Rent rent = (Rent) rentTable.getModel().getValueAt(i, ID_COLUMN_INDEX);
+                checkedRentss.add(rent);
             }
         }
-        return checkedRooms;
+        return checkedRentss;
     }
 
-    private Room assembleRoomFromInput() {
+    private Rent assembleRentFromInput() {
         Long id = currentlyUpdatedEntityId;
-//        Integer number = Integer.valueOf(numberField.getText());
-//        Integer capacity = Integer.valueOf(capacityField.getText());
-//        BigDecimal price = new BigDecimal(priceField.getText());
+        Room room = (Room) roomCombo.getSelectedItem();
+        Person person = (Person) personCombo.getSelectedItem();
+        LocalDate start = StringUtils.parseDate(startField.getText());
+        LocalDate end = StringUtils.parseDate(endField.getText());
+        Integer number = (Integer) numberCombo.getSelectedItem();
 
-//        return new Room(id, capacity, number, price);
-        return new Room();
+        BigDecimal price = room.getPricePerDay().multiply(new BigDecimal(StringUtils.getDayDifference(start, end)));
+        return new Rent(id, price, room, person, start, end, null, number);
     }
 
     private DataSource getDataSource() {
@@ -179,24 +159,18 @@ public class RentForm extends JPanel {
     }
 
     private void initManagers() {
-        rentManager = new RentManagerImpl(getDataSource());
+
         roomManager = new RoomManagerImpl(getDataSource());
         personManager = new PersonManagerImpl(getDataSource());
+        RentManagerImpl manager = new RentManagerImpl(getDataSource());
+        manager.setPersonManager(personManager);
+        manager.setRoomManager(roomManager);
+        rentManager = manager;
     }
 
     private void initVerifiers() {
-//        roomCombo.setInputVerifier(new RequiredInputVerifier());
-//        personCombo.setInputVerifier(new RequiredInputVerifier());
         startField.setInputVerifier(new DateRequiredInputVerifier());
         endField.setInputVerifier(new DateRequiredInputVerifier());
-//        numberCombo.setInputVerifier(new RequiredInputVerifier());
-    }
-
-    private void setFieldValues(Room room) {
-//        numberField.setText(String.valueOf(room.getNumber()));
-//        capacityField.setText(String.valueOf(room.getCapacity()));
-//        priceField.setText(room.getPricePerDay().toString());
-        currentlyUpdatedEntityId = room.getId();
     }
 
     private void clearAllFields() {
@@ -210,8 +184,8 @@ public class RentForm extends JPanel {
         }
     }
 
-    private void reloadRoomTable() {
-        new LoadAllRoomWorker().execute();
+    private void reloadRentTable() {
+        new LoadAllRentWorker().execute();
     }
 
     /**
@@ -270,38 +244,22 @@ public class RentForm extends JPanel {
         protected void done() {
             currentlyUpdatedEntityId = null;
             clearAllFields();
-            reloadRoomTable();
+            reloadRentTable();
         }
     }
 
     /**
      * Swing worker for creating room
      */
-    private class CreateRoomWorker extends ActionRoomWorker<Room> {
+    private class CreateRentWorker extends ActionRoomWorker<Rent> {
 
-        private CreateRoomWorker(Room room) {
-            super(room);
+        private CreateRentWorker(Rent rent) {
+            super(rent);
         }
 
         @Override
         protected Void doInBackground() throws Exception {
-            roomManager.createRoom(getInput());
-            return null;
-        }
-    }
-
-    /**
-     * Swing worker for updating room
-     */
-    private class UpdateActionRoomWorker extends ActionRoomWorker<Room> {
-
-        private UpdateActionRoomWorker(Room room) {
-            super(room);
-        }
-
-        @Override
-        protected Void doInBackground() throws Exception {
-            roomManager.updateRoom(getInput());
+            rentManager.createRent(getInput());
             return null;
         }
     }
@@ -309,16 +267,16 @@ public class RentForm extends JPanel {
     /**
      * Swing worker for deleting room
      */
-    private class DeleteActionRoomWorker extends ActionRoomWorker<List<Room>> {
+    private class DeleteActionRentWorker extends ActionRoomWorker<List<Rent>> {
 
-        private DeleteActionRoomWorker(List<Room> rooms) {
+        private DeleteActionRentWorker(List<Rent> rooms) {
             super(rooms);
         }
 
         @Override
         protected Void doInBackground() throws Exception {
-            for (Room room : getInput()) {
-                roomManager.deleteRoom(room);
+            for (Rent rent : getInput()) {
+                rentManager.deleteRent(rent);
             }
             return null;
         }
@@ -339,6 +297,20 @@ public class RentForm extends JPanel {
             roomCombo.setModel(new MyComboBoxModel<>(safeGet()));
             numberCombo.repaint();
             repaintNumberCombo((Room) roomCombo.getSelectedItem());
+        }
+    }
+
+    private class LoadAllRentWorker extends SafeSwingWorker<List<Rent>, Void> {
+
+        @Override
+        protected List<Rent> doInBackground() throws Exception {
+            return rentManager.findAllRents();
+        }
+
+        @Override
+        protected void done() {
+            rentTable.setModel(new RentTableModel(rentManager.findAllRents()));
+            rentTable.repaint();
         }
     }
 
@@ -367,28 +339,6 @@ public class RentForm extends JPanel {
         protected void done() {
             personCombo.setModel(new MyComboBoxModel<>(safeGet()));
             personCombo.repaint();
-        }
-    }
-
-    /**
-     * Swing worker for loading room by ID
-     */
-    private class LoadRoomWorker extends SafeSwingWorker<Room, Void> {
-
-        private Long roomId;
-
-        private LoadRoomWorker(Long roomId) {
-            this.roomId = roomId;
-        }
-
-        @Override
-        protected Room doInBackground() throws Exception {
-            return roomManager.findRoomById(roomId);
-        }
-
-        @Override
-        protected void done() {
-            setFieldValues(safeGet());
         }
     }
 }

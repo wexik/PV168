@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 /**
@@ -43,13 +46,30 @@ public final class StringUtils {
 
     public static boolean isDate(String str) {
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat sdf = getSimpleDateFormat();
             sdf.parse(str);
         } catch (ParseException e) {
             return false;
         }
 
         return true;
+    }
+
+    public static LocalDate parseDate(String str) {
+        try {
+            return LocalDate.parse(str);
+        } catch (DateTimeParseException e) {
+            throw new RuntimeException("Failed to parse date " + str);
+        }
+    }
+
+    public static int getDayDifference(LocalDate date1, LocalDate date2) {
+
+        return (int) ChronoUnit.DAYS.between(date1, date2);
+    }
+
+    public static SimpleDateFormat getSimpleDateFormat() {
+        return new SimpleDateFormat("yyyy-MM-dd");
     }
 
     public static String printDelimited(List<String> messages, String delimiter) {
