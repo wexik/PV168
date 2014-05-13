@@ -52,7 +52,7 @@ public class RentManagerTest {
         Person person = PersonCreationUtil.createPerson("Name", "666", "address");
         personManager.createPerson(person);
 
-        Room room = new Room(null, 2, BigDecimal.TEN);
+        Room room = new Room(null, 2, 8, BigDecimal.TEN);
         roomManager.createRoom(room);
 
         Rent rent = new Rent(null, BigDecimal.TEN, room, person, startDay, expectedEnd, realEnd, 1);
@@ -66,7 +66,7 @@ public class RentManagerTest {
         Person person = PersonCreationUtil.createPerson("Name", "666", "address");
         personManager.createPerson(person);
 
-        Room room = new Room(null, 2, BigDecimal.TEN);
+        Room room = new Room(null, 2, 8, BigDecimal.TEN);
         roomManager.createRoom(room);
 
         Rent rent = new Rent(null, BigDecimal.TEN, room, person, startDay, expectedEnd, realEnd, 1);
@@ -94,7 +94,7 @@ public class RentManagerTest {
         Person person = PersonCreationUtil.createPerson("Name", "666", "address");
         personManager.createPerson(person);
 
-        Room room = new Room(null, 2, BigDecimal.TEN);
+        Room room = new Room(null, 2, 8, BigDecimal.TEN);
         roomManager.createRoom(room);
 
         Rent rent = new Rent(null, BigDecimal.TEN, room, person, startDay, expectedEnd, realEnd, 1);
@@ -108,7 +108,7 @@ public class RentManagerTest {
         Person person = PersonCreationUtil.createPerson("Name", "666", "address");
         personManager.createPerson(person);
 
-        Room room = new Room(null, 2, BigDecimal.TEN);
+        Room room = new Room(null, 2, 8, BigDecimal.TEN);
         roomManager.createRoom(room);
 
         Rent rent = new Rent(null, BigDecimal.TEN, room, person, startDay, expectedEnd, realEnd, 1);

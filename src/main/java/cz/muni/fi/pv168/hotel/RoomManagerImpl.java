@@ -5,7 +5,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -19,7 +18,7 @@ public class RoomManagerImpl implements RoomManager {
 
     private final JdbcTemplate jdbc;
     private RowMapper<Room> roomMapper = (rs, rowNum) ->
-            new Room(rs.getLong("id"), rs.getInt("capacity"), rs.getBigDecimal("pricePerDay"));
+            new Room(rs.getLong("id"), rs.getInt("capacity"), rs.getInt("number"), rs.getBigDecimal("pricePerDay"));
 
     public RoomManagerImpl(DataSource dataSource) {
         this.jdbc = new JdbcTemplate(dataSource);
@@ -56,8 +55,8 @@ public class RoomManagerImpl implements RoomManager {
         }
 
         try{
-            jdbc.update("UPDATE rooms set capacity=?, pricePerDay=? WHERE id=?",
-                    room.getCapacity(), room.getPricePerDay(), room.getId());
+            jdbc.update("UPDATE rooms set capacity=?, pricePerDay=?, number=? WHERE id=?",
+                    room.getCapacity(), room.getPricePerDay(), room.getNumber(), room.getId());
         } catch (Exception e){
             //log.error
         }
@@ -75,7 +74,7 @@ public class RoomManagerImpl implements RoomManager {
     public Room findRoomById(Long id) throws RoomException {
         //log.debug("getRoomByID({})", i);
         try {
-            return jdbc.queryForObject("SELECT * FROM rooms WHERE id=?", roomMapper, id);
+            return jdbc.queryForObject("SELECT id, capacity, number, pricePerDay FROM rooms WHERE id=?", roomMapper, id);
         } catch (Exception e) {
             //log.error
             return null;
@@ -111,6 +110,7 @@ public class RoomManagerImpl implements RoomManager {
 
         SqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("capacity", room.getCapacity())
+                .addValue("number", room.getNumber())
                 .addValue("pricePerDay", room.getPricePerDay());
 
         Number id = insertRoom.executeAndReturnKey(parameters);

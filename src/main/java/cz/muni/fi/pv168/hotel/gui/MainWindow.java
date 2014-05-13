@@ -14,30 +14,8 @@ public class MainWindow extends JFrame {
     private PersonManager personManager;
 
     private JPanel panel1;
-    private JTabbedPane tabbedPane3;
-    private JTextField textField8;
-    private JTextField textField9;
-    private JTextField textField10;
-    private JTextField textField11;
-    private JTextField textField12;
-    private JButton addButton2;
-    private JButton cancelButton5;
-    private JTextField textField13;
-    private JButton submitButton2;
-    private JButton cancelButton6;
-    private JTextField textField14;
-    private JButton submitButton3;
-    private JButton cancelButton7;
-    private JTextField textField15;
-    private JButton submitButton4;
-    private JButton cancelButton8;
-    private JTable table3;
-    private JTextField textField16;
-    private JButton submitButton5;
-    private JButton cancelButton9;
-    private JButton deleteButton2;
-    private JButton cancelButton10;
-    private JTabbedPane personPanel;
+    private JTabbedPane tabbedPanel;
+    private JTabbedPane roomPanel;
 
     public MainWindow() {
         super();
