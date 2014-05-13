@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.util.concurrent.ExecutionException;
 
 /**
- * @author kurocenko
+ * @author mashka
  */
 public abstract class SafeSwingWorker<T,V> extends SwingWorker<T,V> {
 

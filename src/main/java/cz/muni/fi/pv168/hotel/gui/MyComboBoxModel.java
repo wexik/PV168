@@ -5,7 +5,7 @@ import javax.swing.event.ListDataListener;
 import java.util.List;
 
 /**
- * @author kurocenko
+ * @author mashka
  */
 public class MyComboBoxModel<T> implements ComboBoxModel<T> {
 

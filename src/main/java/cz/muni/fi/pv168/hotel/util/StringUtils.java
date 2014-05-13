@@ -10,7 +10,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 /**
- * @author kurocenko
+ * @author mashka
  */
 public final class StringUtils {
 

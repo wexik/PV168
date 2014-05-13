@@ -5,7 +5,7 @@ import cz.muni.fi.pv168.hotel.util.StringUtils;
 import javax.swing.*;
 
 /**
- * @author kurocenko
+ * @author mashka
  */
 public class PriceRequiredInputVerifier extends RequiredInputVerifier {
 

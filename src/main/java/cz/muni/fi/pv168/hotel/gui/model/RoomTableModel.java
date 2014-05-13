@@ -8,7 +8,7 @@ import javax.swing.table.TableModel;
 import java.util.List;
 
 /**
- * @author kurocenko
+ * @author mashka
  */
 public class RoomTableModel implements TableModel {
 

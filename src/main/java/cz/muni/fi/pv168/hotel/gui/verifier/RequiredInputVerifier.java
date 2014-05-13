@@ -7,7 +7,7 @@ import java.awt.*;
 
 
 /**
- * @author kurocenko
+ * @author mashka
  */
 public class RequiredInputVerifier extends InputVerifier {
 

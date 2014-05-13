@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * @author kurocenko
+ * @author mashka
  */
 public class RentTableModel implements TableModel {
 

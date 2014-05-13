@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author kurocenko
+ * @author mashka
  */
 public class RoomForm extends JPanel {
 

@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author kurocenko
+ * @author mashka
  */
 public class RentForm extends JPanel {
 

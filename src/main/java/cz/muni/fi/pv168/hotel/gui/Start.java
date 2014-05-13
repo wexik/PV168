@@ -1,7 +1,7 @@
 package cz.muni.fi.pv168.hotel.gui;
 
 /**
- * @author kurocenko
+ * @author mashka
  */
 public class Start {
 

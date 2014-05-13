@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author kurocenko
+ * @author mashka
  */
 public class PersonForm extends JPanel {
 

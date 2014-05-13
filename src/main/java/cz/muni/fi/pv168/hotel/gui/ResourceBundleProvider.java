@@ -4,7 +4,7 @@ import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
 /**
- * @author kurocenko
+ * @author mashka
  */
 public final class ResourceBundleProvider {
 
