@@ -8,6 +8,7 @@ import cz.muni.fi.pv168.hotel.RentManagerImpl;
 import cz.muni.fi.pv168.hotel.Room;
 import cz.muni.fi.pv168.hotel.RoomManager;
 import cz.muni.fi.pv168.hotel.RoomManagerImpl;
+import cz.muni.fi.pv168.hotel.gui.verifier.DateRequiredInputVerifier;
 import cz.muni.fi.pv168.hotel.gui.verifier.NumericRequiredInputVerifier;
 import cz.muni.fi.pv168.hotel.gui.verifier.RequiredInputVerifier;
 import cz.muni.fi.pv168.hotel.util.StringUtils;
@@ -128,15 +129,23 @@ public class RentForm extends JPanel {
                 }
             }
         });
+
         deleteButton.setText(ResourceBundleProvider.getMessage("button.delete"));
+
+        roomCombo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                repaintNumberCombo((Room) roomCombo.getSelectedItem());
+            }
+        });
 
         numberLabel.setText(ResourceBundleProvider.getMessage("room.number"));
 //        capacityLabel.setText(ResourceBundleProvider.getMessage("room.capacity"));
 //        priceLabel.setText(ResourceBundleProvider.getMessage("room.price"));
 //        rentTable.setTableHeader(new JTableHeader(new DefaultTableColumnModel()));
 
-        new LoadAllRoomWorker().execute();
         new LoadAllPersonWorker().execute();
+        new LoadAllRoomWorker().execute();
 
         reloadRoomTable();
     }
@@ -176,9 +185,11 @@ public class RentForm extends JPanel {
     }
 
     private void initVerifiers() {
-//        capacityField.setInputVerifier(new NumericRequiredInputVerifier());
-//        priceField.setInputVerifier(new PriceRequiredInputVerifier());
-//        numberField.setInputVerifier(new NumericRequiredInputVerifier());
+//        roomCombo.setInputVerifier(new RequiredInputVerifier());
+//        personCombo.setInputVerifier(new RequiredInputVerifier());
+        startField.setInputVerifier(new DateRequiredInputVerifier());
+        endField.setInputVerifier(new DateRequiredInputVerifier());
+//        numberCombo.setInputVerifier(new RequiredInputVerifier());
     }
 
     private void setFieldValues(Room room) {
@@ -326,7 +337,19 @@ public class RentForm extends JPanel {
         @Override
         protected void done() {
             roomCombo.setModel(new MyComboBoxModel<>(safeGet()));
-            roomCombo.repaint();
+            numberCombo.repaint();
+            repaintNumberCombo((Room) roomCombo.getSelectedItem());
+        }
+    }
+
+    private void repaintNumberCombo(Room room) {
+        if (room != null) {
+            ArrayList<Integer> integers = new ArrayList<Integer>();
+            for (int i = 1; i <= room.getCapacity(); i++) {
+                integers.add(i);
+            }
+            numberCombo.setModel(new MyComboBoxModel<>(integers));
+            numberCombo.repaint();
         }
     }
 

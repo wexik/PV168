@@ -2,6 +2,8 @@ package cz.muni.fi.pv168.hotel.util;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 /**
@@ -33,6 +35,17 @@ public final class StringUtils {
         } catch (NumberFormatException e) {
             return false;
         } catch (ArithmeticException e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean isDate(String str) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            sdf.parse(str);
+        } catch (ParseException e) {
             return false;
         }
 
