@@ -42,6 +42,7 @@ public class RoomForm extends JPanel {
     private JButton deleteButton;
     private JButton updateButton;
     private JPanel panelek;
+    private JPanel panel1;
 
     public RoomForm() {
 
