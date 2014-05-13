@@ -15,9 +15,10 @@ public class Room {
     public Room() {
     }
 
-    public Room(Long id, int capacity, BigDecimal pricePerDay) {
+    public Room(Long id, int capacity, int number, BigDecimal pricePerDay) {
         this.id = id;
         this.capacity = capacity;
+        this.number = number;
         this.pricePerDay = pricePerDay;
     }
 

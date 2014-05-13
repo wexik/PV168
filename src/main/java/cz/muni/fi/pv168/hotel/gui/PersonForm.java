@@ -3,6 +3,7 @@ package cz.muni.fi.pv168.hotel.gui;
 import cz.muni.fi.pv168.hotel.Person;
 import cz.muni.fi.pv168.hotel.PersonManager;
 import cz.muni.fi.pv168.hotel.PersonManagerImpl;
+import cz.muni.fi.pv168.hotel.gui.model.PersonTableModel;
 import cz.muni.fi.pv168.hotel.gui.verifier.NumericRequiredInputVerifier;
 import cz.muni.fi.pv168.hotel.gui.verifier.RequiredInputVerifier;
 import cz.muni.fi.pv168.hotel.util.StringUtils;

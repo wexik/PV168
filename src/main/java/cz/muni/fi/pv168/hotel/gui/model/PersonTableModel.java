@@ -1,6 +1,7 @@
-package cz.muni.fi.pv168.hotel.gui;
+package cz.muni.fi.pv168.hotel.gui.model;
 
 import cz.muni.fi.pv168.hotel.Person;
+import cz.muni.fi.pv168.hotel.gui.ResourceBundleProvider;
 
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
@@ -83,7 +84,7 @@ public class PersonTableModel implements TableModel {
             case 2:
                 return ResourceBundleProvider.getMessage("person.phone");
             case 3:
-                return ResourceBundleProvider.getMessage("person.table.check");
+                return ResourceBundleProvider.getMessage("table.check");
             default:
                 throw new IndexOutOfBoundsException("No column name for index " + column);
         }

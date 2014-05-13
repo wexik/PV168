@@ -1,5 +1,7 @@
 package cz.muni.fi.pv168.hotel.util;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.List;
 
 /**
@@ -19,6 +21,18 @@ public final class StringUtils {
         try {
             Integer.parseInt(str);
         } catch (NumberFormatException e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean isDecimal(String str) {
+        try {
+            new BigDecimal(str, new MathContext(2));
+        } catch (NumberFormatException e) {
+            return false;
+        } catch (ArithmeticException e) {
             return false;
         }
 
